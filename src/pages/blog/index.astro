@@ -1,0 +1,200 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const posts = await Astro.glob('./*.{md,mdx}');
+const sortedPosts = posts.sort((a, b) => 
+  new Date(b.frontmatter.pubDate).valueOf() - new Date(a.frontmatter.pubDate).valueOf()
+);
+---
+
+<BaseLayout title="Blog - My Astro Site" description="Read our latest blog posts">
+  <Header />
+  <main>
+    <section class="blog-header">
+      <div class="container">
+        <h1>Blog</h1>
+        <p class="blog-intro">
+          Sample blog posts created with wp2astro. Replace these with your WordPress content!
+        </p>
+      </div>
+    </section>
+
+    <section class="blog-posts">
+      <div class="container">
+        {sortedPosts.length > 0 ? (
+          <div class="posts-grid">
+            {sortedPosts.map((post) => (
+              <article class="post-card">
+                <a href={post.url} class="post-link">
+                  <h2 class="post-title">{post.frontmatter.title}</h2>
+                  <div class="post-meta">
+                    <time datetime={post.frontmatter.pubDate}>
+                      {new Date(post.frontmatter.pubDate).toLocaleDateString('en-us', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </time>
+                    <span class="post-author">by {post.frontmatter.author}</span>
+                  </div>
+                  {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
+                    <div class="post-tags">
+                      {post.frontmatter.tags.slice(0, 3).map((tag: string) => (
+                        <span class="tag">#{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                  <p class="post-excerpt">{post.frontmatter.description}</p>
+                  <span class="post-read-more">Read more →</span>
+                </a>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state">
+            <p>No blog posts yet. Create your first post to get started!</p>
+          </div>
+        )}
+      </div>
+    </section>
+  </main>
+  <Footer />
+  <style>
+    .blog-header {
+      padding: var(--spacing-2xl) 0 var(--spacing-xl);
+      text-align: center;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+    }
+
+    .blog-header h1 {
+      color: white;
+      font-size: 3rem;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .blog-intro {
+      font-size: 1.125rem;
+      opacity: 0.95;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .blog-posts {
+      padding: var(--spacing-2xl) 0;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-xl);
+    }
+
+    @media (min-width: 768px) {
+      .posts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .posts-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .post-card {
+      background: var(--color-bg-alt);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .post-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary-light);
+    }
+
+    .post-link {
+      display: block;
+      padding: var(--spacing-xl);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .post-title {
+      font-size: 1.5rem;
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-text);
+      transition: color 0.2s ease;
+    }
+
+    .post-link:hover .post-title {
+      color: var(--color-primary);
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      color: var(--color-text-light);
+      font-size: 0.875rem;
+      margin-bottom: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .post-author {
+      color: var(--color-text-lighter);
+    }
+
+    .post-tags {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .tag {
+      background: var(--color-primary);
+      color: white;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .post-excerpt {
+      color: var(--color-text-light);
+      margin-bottom: var(--spacing-md);
+      line-height: 1.6;
+    }
+
+    .post-read-more {
+      color: var(--color-primary);
+      font-weight: 600;
+      font-size: 0.875rem;
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    .post-link:hover .post-read-more {
+      transform: translateX(4px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-2xl);
+      color: var(--color-text-light);
+    }
+
+    @media (max-width: 767px) {
+      .blog-header h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</BaseLayout>
