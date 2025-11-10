@@ -1,0 +1,330 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// Get recent blog posts
+const allPosts = await Astro.glob('./blog/*.{md,mdx}');
+const recentPosts = allPosts
+  .filter((post) => post.frontmatter.pubDate)
+  .sort((a, b) => 
+    new Date(b.frontmatter.pubDate).valueOf() - new Date(a.frontmatter.pubDate).valueOf()
+  )
+  .slice(0, 10);
+
+// Get unique categories/tags
+const allTags = new Set<string>();
+allPosts.forEach((post) => {
+  if (post.frontmatter.tags && Array.isArray(post.frontmatter.tags)) {
+    post.frontmatter.tags.forEach((tag: string) => allTags.add(tag));
+  }
+});
+const categories = Array.from(allTags).slice(0, 10);
+---
+
+<BaseLayout title="Home - My Site">
+  <Header />
+  <main>
+    <div class="container">
+      <div class="content-wrapper">
+        <div class="main-content">
+          {recentPosts.length > 0 ? (
+            <section class="posts-section">
+              <h1 class="section-title">Latest Posts</h1>
+              <div class="posts-list">
+                {recentPosts.map((post) => (
+                  <article class="post-entry">
+                    <header class="entry-header">
+                      <h2 class="entry-title">
+                        <a href={post.url}>{post.frontmatter.title}</a>
+                      </h2>
+                      <div class="entry-meta">
+                        <time class="published" datetime={post.frontmatter.pubDate}>
+                          {new Date(post.frontmatter.pubDate).toLocaleDateString('en-us', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </time>
+                        {post.frontmatter.author && (
+                          <span class="author"> by <span class="author-name">{post.frontmatter.author}</span></span>
+                        )}
+                      </div>
+                    </header>
+                    <div class="entry-content">
+                      {post.frontmatter.description && (
+                        <p class="entry-excerpt">{post.frontmatter.description}</p>
+                      )}
+                      <a href={post.url} class="read-more">Continue reading →</a>
+                    </div>
+                    {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
+                      <footer class="entry-footer">
+                        <span class="tags-links">
+                          {post.frontmatter.tags.map((tag: string, index: number) => (
+                            <>
+                              <a href={"/blog?tag=" + tag} rel="tag">{tag}</a>
+                              {index < post.frontmatter.tags.length - 1 && ', '}
+                            </>
+                          ))}
+                        </span>
+                      </footer>
+                    )}
+                  </article>
+                ))}
+              </div>
+              <nav class="pagination">
+                <a href="/blog" class="nav-links">View All Posts →</a>
+              </nav>
+            </section>
+          ) : (
+            <section class="welcome-section">
+              <h1>Welcome</h1>
+              <p>This is your new site. Start by adding some blog posts!</p>
+              <p>You can add your WordPress content by importing posts or creating new ones in the <code>src/pages/blog/</code> directory.</p>
+            </section>
+          )}
+        </div>
+
+        <aside class="sidebar">
+          <div class="widget">
+            <h3 class="widget-title">Recent Posts</h3>
+            <ul class="widget-list">
+              {recentPosts.slice(0, 5).map((post) => (
+                <li>
+                  <a href={post.url}>{post.frontmatter.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {categories.length > 0 && (
+            <div class="widget">
+              <h3 class="widget-title">Categories</h3>
+              <ul class="widget-list">
+                {categories.map((category) => (
+                  <li>
+                    <a href={"/blog?tag=" + category}>{category}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div class="widget">
+            <h3 class="widget-title">Archives</h3>
+            <ul class="widget-list">
+              <li><a href="/blog">All Posts</a></li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <Footer />
+  <style>
+    .content-wrapper {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-2xl);
+      padding: var(--spacing-xl) 0;
+    }
+
+    @media (min-width: 1024px) {
+      .content-wrapper {
+        grid-template-columns: 2fr 1fr;
+        gap: var(--spacing-2xl);
+      }
+    }
+
+    .main-content {
+      min-width: 0;
+    }
+
+    .posts-section {
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-xl);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 2px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .posts-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-2xl);
+    }
+
+    .post-entry {
+      padding-bottom: var(--spacing-xl);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .post-entry:last-child {
+      border-bottom: none;
+    }
+
+    .entry-header {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .entry-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      line-height: 1.3;
+    }
+
+    .entry-title a {
+      color: var(--color-text);
+      text-decoration: none;
+    }
+
+    .entry-title a:hover {
+      color: var(--color-primary);
+      text-decoration: underline;
+    }
+
+    .entry-meta {
+      font-size: 0.875rem;
+      color: var(--color-text-light);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .entry-meta .published {
+      color: var(--color-text-light);
+    }
+
+    .entry-meta .author {
+      color: var(--color-text-lighter);
+    }
+
+    .entry-meta .author-name {
+      font-weight: 500;
+    }
+
+    .entry-content {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .entry-excerpt {
+      color: var(--color-text);
+      line-height: 1.7;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .read-more {
+      color: var(--color-primary);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .read-more:hover {
+      text-decoration: underline;
+    }
+
+    .entry-footer {
+      margin-top: var(--spacing-md);
+      font-size: 0.875rem;
+    }
+
+    .tags-links {
+      color: var(--color-text-light);
+    }
+
+    .tags-links a {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+
+    .tags-links a:hover {
+      text-decoration: underline;
+    }
+
+    .pagination {
+      margin-top: var(--spacing-xl);
+      padding-top: var(--spacing-xl);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .nav-links {
+      color: var(--color-primary);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .nav-links:hover {
+      text-decoration: underline;
+    }
+
+    .welcome-section {
+      padding: var(--spacing-xl) 0;
+    }
+
+    .welcome-section h1 {
+      font-size: 2rem;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .welcome-section p {
+      margin-bottom: var(--spacing-md);
+      line-height: 1.7;
+    }
+
+    .sidebar {
+      min-width: 0;
+    }
+
+    .widget {
+      background: var(--color-bg-alt);
+      border: 1px solid var(--color-border);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .widget-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .widget-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .widget-list li {
+      margin-bottom: var(--spacing-sm);
+      padding-left: 0;
+    }
+
+    .widget-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .widget-list a {
+      color: var(--color-text);
+      text-decoration: none;
+      line-height: 1.6;
+    }
+
+    .widget-list a:hover {
+      color: var(--color-primary);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1023px) {
+      .sidebar {
+        margin-top: var(--spacing-xl);
+      }
+    }
+  </style>
+</BaseLayout>
