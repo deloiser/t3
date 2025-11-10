@@ -1,0 +1,175 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const { frontmatter } = Astro.props;
+---
+
+<BaseLayout title={frontmatter.title + ' - WPCodeBox Playground'} description={frontmatter.description}>
+  <Header />
+  <main>
+    <article class="blog-post">
+      <div class="container">
+        <div class="post-header">
+          <a href="/blog" class="back-link">← Back to Blog</a>
+          <h1 class="post-title">{frontmatter.title}</h1>
+          <div class="post-meta">
+            <div class="meta-row">
+              <time datetime={frontmatter.pubDate} class="post-date">
+                {new Date(frontmatter.pubDate).toLocaleDateString('en-us', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </time>
+              <span class="meta-separator">•</span>
+              <span class="post-author">By {frontmatter.author}</span>
+            </div>
+            {frontmatter.tags && frontmatter.tags.length > 0 && (
+              <div class="post-tags">
+                {frontmatter.tags.map((tag: string) => (
+                  <a href={'/blog?tag=' + tag} class="tag">#{tag}</a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div class="post-content">
+          <slot />
+        </div>
+      </div>
+    </article>
+  </main>
+  <Footer />
+  <style>
+    .blog-post {
+      padding: var(--spacing-xl) 0 var(--spacing-2xl);
+    }
+
+    .post-header {
+      max-width: 800px;
+      margin: 0 auto var(--spacing-2xl);
+      padding-bottom: var(--spacing-xl);
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .back-link {
+      display: inline-block;
+      color: var(--color-text-light);
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: var(--spacing-lg);
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+
+    .post-title {
+      font-size: 3rem;
+      margin-bottom: var(--spacing-lg);
+      line-height: 1.1;
+    }
+
+    .post-meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      color: var(--color-text-light);
+      font-size: 0.9375rem;
+      flex-wrap: wrap;
+    }
+
+    .post-date {
+      font-weight: 500;
+    }
+
+    .meta-separator {
+      color: var(--color-text-lighter);
+    }
+
+    .post-author {
+      color: var(--color-text-light);
+    }
+
+    .post-tags {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: var(--color-primary);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 0.375rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .tag:hover {
+      background: var(--color-primary-dark);
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+
+    .post-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .post-content :global(h2) {
+      margin-top: var(--spacing-2xl);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .post-content :global(h3) {
+      margin-top: var(--spacing-xl);
+    }
+
+    .post-content :global(p) {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: var(--color-text);
+    }
+
+    .post-content :global(ul), .post-content :global(ol) {
+      font-size: 1.0625rem;
+      line-height: 1.8;
+    }
+
+    .post-content :global(blockquote) {
+      font-size: 1.125rem;
+      padding-left: var(--spacing-xl);
+      margin: var(--spacing-xl) 0;
+    }
+
+    .post-content :global(img) {
+      margin: var(--spacing-xl) 0;
+      box-shadow: var(--shadow-md);
+    }
+
+    @media (max-width: 767px) {
+      .post-title {
+        font-size: 2rem;
+      }
+
+      .post-content :global(p) {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</BaseLayout>
