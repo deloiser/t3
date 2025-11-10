@@ -1,0 +1,121 @@
+---
+layout: ../../layouts/BlogPost.astro
+title: 'Markdown Guide for Content Creators'
+description: 'A comprehensive guide to writing content in Markdown for your Astro blog.'
+pubDate: '2024-01-20'
+author: 'Jane Smith'
+tags: ['markdown', 'tutorial', 'content']
+---
+
+# Markdown Guide for Content Creators
+
+Markdown is a lightweight markup language that makes writing for the web easy and intuitive. This guide covers everything you need to know.
+
+## Basic Formatting
+
+Here are the basics:
+
+- **Bold text** with `**double asterisks**`
+- *Italic text* with `*single asterisks*`
+- `Inline code` with backticks
+
+## Headings
+
+Use hashtags for headings:
+
+```markdown
+# H1 Heading
+## H2 Heading
+### H3 Heading
+```
+
+## Lists
+
+### Unordered Lists
+
+- Item one
+- Item two
+  - Nested item
+  - Another nested item
+- Item three
+
+### Ordered Lists
+
+1. First item
+2. Second item
+3. Third item
+
+## Links and Images
+
+Create links like this: [Astro Documentation](https://docs.astro.build)
+
+Images work similarly:
+`![Alt text](image-url.jpg)`
+
+## Code Blocks
+
+Use triple backticks for code blocks:
+
+```javascript
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+
+console.log(greet("Astro"));
+```
+
+```python
+def greet(name):
+    return f"Hello, {name}!"
+
+print(greet("Astro"))
+```
+
+## Blockquotes
+
+> "Markdown is a text-to-HTML conversion tool for web writers."
+> 
+> — John Gruber, creator of Markdown
+
+## Tables
+
+| Feature | WordPress | Astro |
+|---------|-----------|-------|
+| Speed | Slow | Fast ⚡ |
+| Database | Required | None |
+| Hosting | PHP needed | Static hosting |
+
+## Horizontal Rules
+
+Create dividers with three dashes:
+
+---
+
+## Tips for WordPress Migrants
+
+If you're coming from WordPress:
+
+1. Convert your posts to Markdown files
+2. Keep the same URL structure in frontmatter
+3. Move images to the `public/` folder
+4. Update internal links
+
+## Frontmatter
+
+Every Markdown post needs frontmatter at the top:
+
+```yaml
+---
+title: 'Your Post Title'
+description: 'A brief description'
+pubDate: '2024-01-20'
+author: 'Your Name'
+tags: ['tag1', 'tag2']
+---
+```
+
+## Conclusion
+
+Markdown makes content creation a breeze. Once you get used to it, you'll never want to go back to a WYSIWYG editor!
+
+Happy writing! ✍️
