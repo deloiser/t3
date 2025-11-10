@@ -1,0 +1,129 @@
+---
+const currentPath = Astro.url.pathname;
+
+// Get all pages (excluding blog posts, index, and 404)
+const allPages = await Astro.glob('../pages/**/*.{md,astro}');
+const pages = allPages
+  .filter((page) => {
+    const url = page.url || '';
+    // Exclude blog posts, index, 404, and files in subdirectories
+    return (
+      !url.includes('/blog/') &&
+      url !== '/' &&
+      url !== '/404' &&
+      !url.includes('/blog') &&
+      url.split('/').filter(Boolean).length === 1 // Only top-level pages
+    );
+  })
+  .map((page) => {
+    const url = page.url || '';
+    const frontmatter = 'frontmatter' in page ? page.frontmatter : {};
+    return {
+      url,
+      title: frontmatter.title || url.split('/').pop()?.replace(/-/g, ' ') || 'Page',
+      slug: url.replace('/', ''),
+    };
+  })
+  .sort((a, b) => a.title.localeCompare(b.title));
+---
+
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <a href="/" class="logo">
+        <svg width="24" height="24" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M64 0C28.7 0 0 28.7 0 64s28.7 64 64 64 64-28.7 64-64S99.3 0 64 0zm0 120C33.1 120 8 94.9 8 64S33.1 8 64 8s56 25.1 56 56-25.1 56-56 56z" fill="currentColor"/>
+          <path d="M64 24L80 56H48L64 24z" fill="currentColor"/>
+          <path d="M64 72L48 104H80L64 72z" fill="currentColor"/>
+        </svg>
+        <span>WPCodeBox Playground</span>
+      </a>
+      <div class="nav-links">
+        <a href="/" class={currentPath === '/' ? 'active' : ''}>Home</a>
+        <a href="/blog" class={currentPath.startsWith('/blog') ? 'active' : ''}>Blog</a>
+        {pages.length > 0 && pages.map((page) => (
+          <a 
+            href={page.url} 
+            class={currentPath === page.url ? 'active' : ''}
+          >
+            {page.title}
+          </a>
+        ))}
+      </div>
+    </nav>
+  </div>
+  <style>
+    .header {
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md) 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--color-text);
+      transition: color 0.2s ease;
+    }
+
+    .logo:hover {
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+
+    .logo svg {
+      color: var(--color-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--spacing-lg);
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--color-text-light);
+      font-weight: 500;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius);
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--color-primary);
+      background: var(--color-bg-alt);
+      text-decoration: none;
+    }
+
+    .nav-links a.active {
+      color: var(--color-primary);
+      background: var(--color-bg-alt);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+      }
+
+      .nav-links a {
+        font-size: 0.875rem;
+        padding: var(--spacing-xs);
+      }
+    }
+  </style>
+</header>
